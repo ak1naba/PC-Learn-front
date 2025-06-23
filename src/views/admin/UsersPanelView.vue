@@ -1,0 +1,186 @@
+<template>
+    <ControlPanelView>
+      <div class="users-panel">
+        <h3 class="users-panel__title">
+          Пользователи
+        </h3>
+        <div class="users">
+          <div class="filter">
+            <div class="filter-params">
+              <input type="text" v-model="searchText" @input="search()" placeholder="Введите имя или почту пользователя" class="search input">
+              <select v-model="selectedType" @change="search()" class="type input">
+                <option value="">Все</option>
+                <option value="1">Администратор</option>
+                <option value="2">Ученик</option>
+              </select>
+            </div>
+            <button @click.prevent="resetFilter" class="btn btn-primary">Сбросить</button>
+          </div>
+          <div v-if="this.searchText!='' || this.selectedType!=''" class="users-item" v-for="(user, index) in filteredUsers" :key="index">
+            <div class="users-item__avatar">
+              <img :src="user.avatar" alt="">
+            </div>
+            <div class="users-item__name">
+              {{user.name}}
+            </div>
+            <div class="users-item__email">
+              {{user.email}}
+            </div>
+            <div class="users-item__role">
+              <p v-if="user.role==1">Администратор</p>
+              <p v-if="user.role==2">Ученик</p>
+            </div>
+          </div>
+
+          <div v-if="this.searchText=='' && this.selectedType==''" >
+            <div class="users-item" v-for="(user, index) in displayedUsers" :key="index">
+              <div class="users-item__avatar">
+                <img :src="user.avatar" alt="">
+              </div>
+              <div class="users-item__name">
+                {{user.name}}
+              </div>
+              <div class="users-item__email">
+                {{user.email}}
+              </div>
+              <div class="users-item__role">
+                <p v-if="user.role==1">Администратор</p>
+                <p v-if="user.role==2">Ученик</p>
+              </div>
+              <div class="users-item__email">
+                {{user.created_at}}{{user.updated_at}}
+              </div>
+            </div>
+            <div class="pagination">
+              <button v-if="currentPage > 1" @click="currentPage--">Предыдущая</button>
+              <span>{{currentPage}} / {{pageCount}}</span>
+              <button v-if="currentPage < pageCount" @click="currentPage++">Следующая</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </ControlPanelView>
+
+</template>
+
+<script>
+import axios from "axios";
+import ControlPanelView from '@/views/admin/ControlPanelView.vue'
+
+export default {
+    name: 'UsersPanelView',
+  components: { ControlPanelView },
+    data() {
+        return {
+            users: [],
+            currentPage: 1,
+            perPage: 3,
+            searchText:'',
+            selectedType:'',
+        };
+    },
+    computed: {
+        displayedUsers() {
+            const start = (this.currentPage - 1) * this.perPage;
+            const end = start + this.perPage;
+            return this.users.slice(start, end);
+        },
+        pageCount() {
+            return Math.ceil(this.users.length / this.perPage);
+        },
+        filteredUsers() {
+            return this.users.filter((user) => {
+                const searchTerms = this.searchText.toLowerCase().trim().split(" ");
+                return searchTerms.every((term) => {
+                    return (
+                        user.name.toLowerCase().includes(term) ||
+                        user.email.toLowerCase().includes(term)
+                    );
+                }) && (this.selectedType === "" || user.role === parseInt(this.selectedType));
+            });
+        },
+    },
+    methods: {
+        getUsers() {
+            axios.get('/api/users')
+                .then(res => {
+                    this.users = res.data.data;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        },
+        resetFilter(){
+            this.selectedType='';
+            this.searchText='';
+        },
+        search() {
+        },
+    },
+    mounted() {
+        this.getUsers();
+    },
+}
+</script>
+
+<style scoped lang="scss">
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    background: #ccc;
+    border: none;
+    padding: 10px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.pagination span {
+    display: inline-block;
+    padding: 10px;
+}
+
+.users-panel{
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  &__title{
+    font-size: 1.4em;
+  }
+
+  .users{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &-item{
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      &__avatar{
+        padding-right: 48px;
+        padding-bottom: 48px;
+        overflow: hidden;
+        position: relative;
+        overflow: hidden;
+        border-radius: 50%;
+        img{
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
+}
+
+</style>
