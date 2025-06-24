@@ -12,14 +12,14 @@
         <nav class="footer-nav">
           <div class="footer-nav__column">
             <h3 class="footer-nav__column__title">Сообществу</h3>
-            <a href="" class="footer-nav__column__link"> О площадке </a>
-            <a href="" class="footer-nav__column__link"> Контакты </a>
-            <a href="" class="footer-nav__column__link"> Политика конфиденциальности </a>
+            <router-link :to="{name: 'commercial.about'}" class="footer-nav__column__link"> О площадке </router-link>
+            <router-link :to="{name: 'commercial.contacts'}" class="footer-nav__column__link"> Контакты </router-link>
+            <router-link :to="{name: 'commercial.license'}" class="footer-nav__column__link"> Политика конфиденциальности </router-link>
           </div>
           <div class="footer-nav__column">
             <h3 class="footer-nav__column__title">Помощь</h3>
-            <a href="" class="footer-nav__column__link"> Проблемы с аккаунтом </a>
-            <a href="" class="footer-nav__column__link"> Сообщить об ошибке </a>
+            <router-link :to="{name: 'commercial.contacts'}" class="footer-nav__column__link"> Проблемы с аккаунтом </router-link>
+            <router-link :to="{name: 'commercial.contacts'}" class="footer-nav__column__link"> Сообщить об ошибке </router-link>
           </div>
           <div class="footer-nav__column">
             <h3 class="footer-nav__column__title">Социальные сети</h3>
@@ -32,7 +32,8 @@
   </footer>
 </template>
 
-<script></script>
+<script>
+</script>
 
 <style scoped lang="scss">
 @import '@/assets/style/colors.scss';

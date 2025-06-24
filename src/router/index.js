@@ -14,6 +14,11 @@ const router = createRouter({
       name: 'user.login',
     },
     {
+      path: '/signup',
+      component: () => import('@/views/User/RegistrationView.vue'),
+      name: 'user.signup',
+    },
+    {
       path: '/home',
       component: () => import('@/views/User/HomeView.vue'),
       name: 'home',
@@ -70,11 +75,64 @@ const router = createRouter({
       name:'game.practic',
     },
     {
+      path:'/commercial/about',
+      component:()=>import('@/views/commercialFactors/AboutView.vue'),
+      name:'commercial.about'
+    },
+    {
+      path:'/commercial/license',
+      component:()=>import('@/views/commercialFactors/LicenseView.vue'),
+      name:'commercial.license'
+    },
+    {
+      path:'/commercial/contacts',
+      component:()=>import('@/views/commercialFactors/ContactsView.vue'),
+      name:'commercial.contacts'
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: '404',
       component: () => import('@/views/404View.vue'),
     },
   ],
 })
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('auth_token');
+  const roleUser = JSON.parse(localStorage.getItem('roleUser'))?.role; // Добавлена безопасная проверка
+
+  // Настройка доступа к общедоступным страницам
+  if (to.name && to.name.startsWith('commercial.')) {
+    return next();
+  }
+
+  // Если пользователь не залогинен
+  if (!token) {
+    // Разрешаем доступ к главной странице и странице входа
+    if (to.name === 'user.login' || to.name === 'main') {
+      return next();
+    }
+    // Перенаправляем на страницу входа для всех других маршрутов
+    return next({ name: 'user.login' });
+  }
+
+  // Если пользователь залогинен
+  if (to.name == 'user.login') {
+    // Не разрешаем доступ к странице входа для авторизованных пользователей
+    return next({ name: 'home' });
+  }
+
+  // Проверка прав администратора
+  if (to.name && to.name.startsWith('admin.')) {
+    if (roleUser != "1") {
+      return next({ name: 'home' });
+    }
+    return next();
+  }
+
+  // Для всех других маршрутов разрешаем доступ
+  next();
+})
+
 
 export default router
