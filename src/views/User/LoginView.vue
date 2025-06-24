@@ -21,7 +21,7 @@
 
           <div>
             Нет аккаунта?
-            <a href="../user/signup" class="form-user__inputs__link">Зарегистрироваться</a>
+            <router-link :to="{name: 'user.signup'}" class="form-user__inputs__link">Зарегистрироваться</router-link>
           </div>
         </form>
       </div>

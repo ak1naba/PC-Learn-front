@@ -109,7 +109,7 @@ router.beforeEach((to, from, next) => {
   // Если пользователь не залогинен
   if (!token) {
     // Разрешаем доступ к главной странице и странице входа
-    if (to.name === 'user.login' || to.name === 'main') {
+    if (to.name === 'user.login' || to.name === "user.signup" || to.name === 'main') {
       return next();
     }
     // Перенаправляем на страницу входа для всех других маршрутов
@@ -117,7 +117,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // Если пользователь залогинен
-  if (to.name == 'user.login') {
+  if (to.name == 'user.login' || to.name == 'user.signup') {
     // Не разрешаем доступ к странице входа для авторизованных пользователей
     return next({ name: 'home' });
   }
