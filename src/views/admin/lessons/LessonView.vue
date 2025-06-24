@@ -180,13 +180,14 @@
                   </div>
                 </div>
 
-                <div
+                <img
+                  src="@/assets/icons/switch.png"
                   :data-id="relative_element.id"
                   @dragstart="dragStart(relative_element.id)"
                   draggable="true"
                   class="switcher"
                   v-if="relative_element.id && relative_element.state.length != 0"
-                ></div>
+                ></img>
               </div>
             </div>
             <div class="states">
@@ -650,8 +651,7 @@ export default {
 }
 
 .switcher {
-  width: 5vw;
-  height: 5vh;
-  background-color: #4a5568;
+  height: 64px;
+  width: 64px;
 }
 </style>

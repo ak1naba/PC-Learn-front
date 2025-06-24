@@ -21,8 +21,6 @@
               <h3 class="title">
                 {{lesson.lesson.title}}
               </h3>
-              <div class="content" v-html="lesson.lesson.theory">
-              </div>
               <div class="actions-lesson">
                 <button class="btn btn-primary" @click.prevent="getLessonRouter(lesson.lesson)">Изучить</button>
                 <div class="lesson-status">

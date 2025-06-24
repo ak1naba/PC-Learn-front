@@ -104,6 +104,7 @@ export default {
           name: 'game.list',
           params: { type: 'theory' }
         });
+        return
       }
 
       this.$router.push({
