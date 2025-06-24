@@ -1,33 +1,38 @@
 <template>
   <BaseLayout>
     <div class="container">
-      <div class="lesson-block">
+      <div v-if="!isLoading" class="lesson-block">
         <div class="btn-group">
-          <button @click="showModalWindow" class="btn btn-danger">Удалить</button>
-          <button @click.prevent="$event=>getLessonEdit(lesson.url_title)" class="btn btn-primary">Редактировать</button>
+          <BaseButton variant="danger" @click=" this.isModalActive = !this.isModalActive">Удалить</BaseButton>
+          <BaseButton variant="primary" @click="getLessonEdit()"
+            >Редактировать
+          </BaseButton>
         </div>
-        <dialog close class="modal-window">
+        <div v-if="isModalActive" class="modal-window">
           <h3>Вы действительно хотите удалить задание?</h3>
           <div class="btn-group">
-            <button @click="deleteLesson" class="btn btn-danger">Удалить</button>
-            <button @click="showModalWindow" class="btn btn-primary ">Отмена</button>
+            <BaseButton @click="deleteLesson" variant="danger">Удалить</BaseButton>
+            <BaseButton variant="primary ">Отмена</BaseButton>
           </div>
-        </dialog>
+        </div>
         <h2 class="lesson-block__title">
           {{ lesson.title }}
           <span class="lesson-block__title__sub">
-                {{ lesson.url_title }}
-            </span>
+            {{ lesson.url_title }}
+          </span>
         </h2>
-        <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id==1">Теория</p>
-        <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id==2">Практика</p>
+        <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id == 1">Теория</p>
+        <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id == 2">Практика</p>
         <p class="lesson-block__text" v-html="lesson.theory"></p>
         <div class="media-block">
-          <h3 class="media-block__title">
-            Добавление медиаматериалов
-          </h3>
-          <div class="media-block__theory" v-if="lesson.type_lesson_id==1">
-            <form method="post" @submit="addMedia" class="media-block__form" enctype="multipart/form-data">
+          <h3 class="media-block__title">Добавление медиаматериалов</h3>
+          <div class="media-block__theory" v-if="lesson.type_lesson_id == 1">
+            <form
+              method="post"
+              @submit.prevent="addMedia"
+              class="media-block__form"
+              enctype="multipart/form-data"
+            >
               <div class="form-block">
                 <input id="file" name="material" type="file" class="input" />
               </div>
@@ -36,17 +41,28 @@
               </div>
             </form>
             <div class="lesson-panel__img__container">
-              <div v-for="material in lesson.materials" :key="material.id" class="material-container"
-                   @mouseover="addHoverClassImg($event)" @mouseout="addHoverClassImg($event)">
+              <div
+                v-for="material in lesson.materials"
+                :key="material.id"
+                class="material-container"
+                @mouseover="addHoverClassImg($event)"
+                @mouseout="addHoverClassImg($event)"
+              >
                 <img class="img-material" :src="material.part_img" />
-                <BaseButton variant="primary" @click="deleteMaterial(material.id)">Удалить</BaseButton>
+                <BaseButton variant="primary" @click="deleteMaterial(material.id)"
+                  >Удалить</BaseButton
+                >
               </div>
             </div>
           </div>
-          <div class="media-block__practic" v-if="lesson.type_lesson_id==2">
+          <div class="media-block__practic" v-if="lesson.type_lesson_id == 2">
             <div v-if="lesson.materials.length === 0">
-              <form method="post" @submit.prevent="addMediaRelative" class="media-block__form"
-                    enctype="multipart/form-data">
+              <form
+                method="post"
+                @submit.prevent="addMediaRelative"
+                class="media-block__form"
+                enctype="multipart/form-data"
+              >
                 <h4>Выбор родительского элемента</h4>
                 <div class="form-block">
                   <input id="fileRelative" name="materialRelative" type="file" class="input" />
@@ -56,85 +72,137 @@
                 </div>
               </form>
             </div>
-            <div v-else-if="!lesson.materials.some(material => material.relative_element === 1)">
-              <Form method="post" @submit="addMediaRelative" class="media-block__form" enctype="multipart/form-data">
+            <div v-else-if="!lesson.materials.some((material) => material.relative_element == 1)">
+              <Form
+                method="post"
+                @submit="addMediaRelative"
+                class="media-block__form"
+                enctype="multipart/form-data"
+              >
                 <h4>Выбор родительского элемента</h4>
                 <div class="form-block">
-                  <input id="fileRelative" name="materialRelative" type="file" class="input">
+                  <input id="fileRelative" name="materialRelative" type="file" class="input" />
                 </div>
                 <div class="form-block">
-                  <button type="submit" class="btn btn-primary">Добавить</button>
+                  <BaseButton type="submit" variant="primary">Добавить</BaseButton>
                 </div>
               </Form>
             </div>
-            <div v-if="lesson.materials.some(material => material.relative_element) && relative_element.state.length<2">
-              <form method="post" @submit.prevent="addMediaStateRelative" class="media-block__form"
-                    enctype="multipart/form-data">
+            <div
+              v-if="
+                lesson.materials.some((material) => material.relative_element) &&
+                relative_element.state.length < 2
+              "
+            >
+              <form
+                method="post"
+                @submit.prevent="addMediaStateRelative"
+                class="media-block__form"
+                enctype="multipart/form-data"
+              >
                 <h4>Выбор состояния родителя</h4>
                 <div class="form-block">
-                  <input id="materialStateRelative" name="materialStateRelative" type="file" class="input">
+                  <input
+                    id="materialStateRelative"
+                    name="materialStateRelative"
+                    type="file"
+                    class="input"
+                  />
                 </div>
                 <div class="form-block">
-                  <button type="submit" class="btn btn-primary">Добавить</button>
+                  <BaseButton type="submit" variant="primary">Добавить</BaseButton>
                 </div>
               </form>
             </div>
             <div>
-              <form method="post" @submit.prevent="addMediaDaughter" class="media-block__form"
-                    enctype="multipart/form-data">
+              <form
+                method="post"
+                @submit.prevent="addMediaDaughter"
+                class="media-block__form"
+                enctype="multipart/form-data"
+              >
                 <h4>Выбор дочернего элемента</h4>
                 <div class="form-block">
-                  <input id="fileDaughter" name="materialDaughter" type="file" class="input">
+                  <input id="fileDaughter" name="materialDaughter" type="file" class="input" />
                 </div>
                 <div class="form-block">
-                  <button type="submit" class="btn btn-primary">Добавить</button>
+                  <BaseButton type="submit" variant="primary">Добавить</BaseButton>
                 </div>
               </form>
             </div>
             <div class="practic">
-              <div class="relative-container"
-                   v-for="material in relative_elements" :key="material.id"
-                   @contextmenu="addHoverClassImg($event)"
-                   @dragover.prevent
-                   @dragenter="dragEnter"
-                   @dragleave="dragLeave"
-                   @drop="dropElement">
+              <div
+                class="relative-container"
+                v-for="material in relative_elements"
+                :key="material.id"
+                @contextmenu="addHoverClassImg($event)"
+                @dragover.prevent
+                @dragenter="dragEnter"
+                @dragleave="dragLeave"
+                @drop="dropElement"
+              >
                 <div class="practic-relative__img">
-                  <img :src="material.part_img" class="img-material">
-                  <button class="btn btn-danger btn-delete" @click="deleteMaterial(material.id)">Удалить</button>
+                  <img :src="material.part_img" class="img-material" />
+                  <BaseButton variant="danger" class="btn-delete" @click="deleteMaterial(material.id)">
+                    Удалить
+                  </BaseButton>
                 </div>
               </div>
               <div class="practic-daughter">
-                <div :data-id="material.id" @dragstart="dragStart(material.id)" v-for="material in daughter_elements"
-                     :key="material.id" class="practic-daughter__img" draggable="true"
-                     @contextmenu="addHoverClassImg($event)">
-                  <img :src="material.part_img" class="img-material">
-                  <div class="btn btn-danger btn-delete lower-delete ">
-                    <svg class=" " @click="deleteMaterial(material.id)" width="14" height="14" viewBox="0 0 14 14"
-                         fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13 1L1 13M1 1L13 13" stroke="#fff" stroke-width="1.5" stroke-linecap="round"
-                            stroke-linejoin="round" />
+                <div
+                  :data-id="material.id"
+                  @dragstart="dragStart(material.id)"
+                  v-for="material in daughter_elements"
+                  :key="material.id"
+                  class="practic-daughter__img"
+                  draggable="true"
+                  @contextmenu="addHoverClassImg($event)"
+                >
+                  <img :src="material.part_img" class="img-material" />
+                  <div class="btn btn-danger btn-delete lower-delete">
+                    <svg
+                      class=" "
+                      @click="deleteMaterial(material.id)"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M13 1L1 13M1 1L13 13"
+                        stroke="#fff"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
                     </svg>
                   </div>
                 </div>
 
-                <div :data-id="relative_element.id" @dragstart="dragStart(relative_element.id)" draggable="true"
-                     class="switcher" v-if="relative_element.id && relative_element.state.length != 0">
-                </div>
-
+                <div
+                  :data-id="relative_element.id"
+                  @dragstart="dragStart(relative_element.id)"
+                  draggable="true"
+                  class="switcher"
+                  v-if="relative_element.id && relative_element.state.length != 0"
+                ></div>
               </div>
             </div>
             <div class="states">
               <div v-for="state in relative_element.state" :key="state.id">
-                <img :src="state.part_img" class="img-material">
+                <img :src="state.part_img" class="img-material" />
+                <BaseButton variant="danger" @click="deleteState(state.id)">
+                  Удалить
+                </BaseButton>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div v-else> Ждите... </div>
     </div>
   </BaseLayout>
-
 </template>
 
 <script>
@@ -157,62 +225,70 @@ export default {
       // дочерние элементы
       daughter_elements: [],
       // таскаемый элемент
-      draggedElement: null
+      draggedElement: null,
+
+      isModalActive: false,
+
+      isLoading: true,
     }
   },
   // импорт компонентов
   components: {
     BaseLayout,
-    BaseButton
-
+    BaseButton,
   },
   methods: {
     // Получеам данные от сервера по уроку и парсим их
     getLesson() {
+      this.reset()
       authRequest({
         method: 'get',
         url: `/api/lesson/${this.url_title}`,
-        data: this.form
+        data: this.form,
       })
-        .then(res => {
-            this.lesson = res.data
-            this.lesson.materials.forEach(item => {
-              if (item.relative_element === 1) {
+        .then((res) => {
+          this.lesson = res.data
+          if (this.lesson.type_lesson_id == 2) {
+            this.lesson.materials.forEach((item) => {
+              if (item.relative_element == 1) {
                 this.relative_elements.push(item)
                 this.relative_element = item
               }
-              if (item.relative_element === 0) {
+              if (item.relative_element == 0) {
                 this.daughter_elements.push(item)
               }
-
             })
           }
-        )
-        .catch(err => {
+
+        })
+        .catch((err) => {
           console.log(err)
+        })
+        .finally(() => {
+          this.isLoading = false
         })
     },
     // Показать модальное коно удаления
     showModalWindow() {
-      let modal = document.querySelector('.modal-window')
-      modal.classList.toggle('modal-window__active')
+      console.log('modal')
+      this.isModalActive = !this.isModalActive
     },
     deleteLesson() {
       authRequest({
         method: 'delete',
-        url: `/api/lessons/${this.url_title}`,
-        data: this.form
+        url: `/api/lessons/${this.lesson.id}`,
+        data: this.form,
       })
-        .then(res => {
+        .then((res) => {
           console.log(res)
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
         })
       this.$router.push({ name: 'admin.lessons' })
     },
-    getLessonEdit(url_title) {
-      this.$router.push({ name: 'admin.lessons.edit', params: { url_title: url_title } })
+    getLessonEdit() {
+      this.$router.push({ name: 'admin.lessons.edit', params: { url_title: this.url_title } })
     },
 
     addMedia() {
@@ -220,37 +296,56 @@ export default {
       var imagefile = document.querySelector('#file')
       formData.append('image', imagefile.files[0])
 
-      axios.post('/api/lesson/' + this.lesson.id + '/materials/add', formData).then(res => {
-        console.log(res)
-
-      }).catch(err => {
-        console.log(err)
+      authRequest({
+        method: 'post',
+        url: `/api/lesson/${this.lesson.id}/materials/add`,
+        data: formData,
+        contentType: 'multipart/form-data',
       })
-      location.reload()
-
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     addMediaRelative() {
       var formData = new FormData()
       var imagefile = document.querySelector('#fileRelative')
       formData.append('image', imagefile.files[0])
 
-      axios.post('/api/lesson/' + this.lesson.id + '/materials/add/relative', formData).then(res => {
-        console.log(res)
-      }).catch(err => {
-        console.log(err)
+      authRequest({
+        method: 'post',
+        url: `/api/lesson/${this.lesson.id}/materials/add/relative`,
+        data: formData,
+        contentType: 'multipart/form-data',
       })
-      location.reload()
+        .then((res) => {
+          this.getLesson()
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     addMediaStateRelative() {
       var formData = new FormData()
       var imagefile = document.querySelector('#materialStateRelative')
       formData.append('image', imagefile.files[0])
 
-      axios.post('/api/states/add/' + this.relative_element.id, formData).then(res => {
-        console.log(res)
-      }).catch(err => {
-        console.log(err)
+      authRequest({
+        method: 'post',
+        url: `/api/states/add/${this.relative_element.id}`,
+        data: formData,
+        contentType: 'multipart/form-data',
       })
+        .then((res) => {
+          this.getLesson()
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
       //location.reload();
     },
     addMediaDaughter() {
@@ -258,22 +353,41 @@ export default {
       var imagefile = document.querySelector('#fileDaughter')
       formData.append('image', imagefile.files[0])
 
-      axios.post('/api/lesson/' + this.lesson.id + '/materials/add/daughter', formData).then(res => {
-        console.log(res)
-      }).catch(err => {
-        console.log(err)
+      authRequest({
+        method: 'post',
+        url: `/api/lesson/${this.lesson.id}/materials/add/daughter`,
+        data: formData,
+        contentType: 'multipart/form-data',
       })
-      location.reload()
-
+        .then((res) => {
+          this.getLesson()
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     deleteMaterial(materialId) {
-      console.log(materialId)
-      console.log('/api/materials/' + materialId)
-      axios.delete('/api/materials/' + materialId)
-        .then(response => {
+      authRequest({
+        method: 'delete',
+        url: `/api/materials/${materialId}/`,
+      })
+        .then((response) => {
           this.getLesson()
         })
-        .catch(error => {
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    deleteState(stateId) {
+      authRequest({
+        method: 'delete',
+        url: `/api/states/delete/${stateId}/`,
+      })
+        .then((response) => {
+          this.getLesson()
+        })
+        .catch((error) => {
           console.log(error)
         })
     },
@@ -283,7 +397,6 @@ export default {
       materialContainer.querySelector('.img-material').classList.toggle('low-brightness')
       materialContainer.querySelector('.btn-delete').classList.toggle('active-btn')
     },
-
 
     dragStart(id) {
       this.draggedElement = id
@@ -309,8 +422,10 @@ export default {
 
         console.log(droppedRect.height + ' ' + droppedRect.width)
 
-        const top = ((event.clientY - parentRect.top - droppedRect.height / 2) / parentRect.height) * 100
-        const left = ((event.clientX - parentRect.left - droppedRect.width / 2) / parentRect.width) * 100
+        const top =
+          ((event.clientY - parentRect.top - droppedRect.height / 2) / parentRect.height) * 100
+        const left =
+          ((event.clientX - parentRect.left - droppedRect.width / 2) / parentRect.width) * 100
 
         droppedElement.style.position = 'absolute'
         droppedElement.style.zIndex = '10'
@@ -319,25 +434,49 @@ export default {
 
         parentElement.appendChild(droppedElement)
 
-        axios.patch('/api/materials/' + this.draggedElement + '/update', {
-          'position_x': left,
-          'position_y': top
-        })
-          .then(response => {
+        axios
+          .patch('/api/materials/' + this.draggedElement + '/update', {
+            position_x: left,
+            position_y: top,
+          })
+          .then((response) => {
             console.log(response)
           })
       }
-    }
+    },
+    getImagePath(path) {
+      return `http://localhost:8000/storage/${path}`
+    },
+    reset(){
+      this.lesson = {}
+      this.relative_element = {}
+      this.relative_elements = []
+      this.daughter_elements = []
+      this.draggedElement = null
 
+      console.log('reset')
+      console.log(this.lesson,
+      this.relative_element,
+      this.relative_elements,
+      this.daughter_elements,
+      this.draggedElement,)
+    }
   },
   mounted() {
     this.getLesson()
-  }
+  },
 }
 </script>
 
 <style scoped lang="scss">
 @import '@/assets/style/colors.scss';
+
+.btn-group {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
 
 .lesson-block {
   display: flex;
@@ -365,7 +504,6 @@ export default {
           width: 100%;
           border-radius: 10px;
           transition: 0.2s;
-
         }
 
         .btn-delete {
@@ -378,11 +516,10 @@ export default {
       }
     }
   }
-
 }
 
 .modal-window {
-  display: none;
+  display: flex;
 
   position: fixed;
   left: 50%;
@@ -422,7 +559,8 @@ export default {
     font-size: 1.4em;
   }
 
-  &__theory, &__practic {
+  &__theory,
+  &__practic {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -465,7 +603,7 @@ export default {
 
 .practic-daughter__img {
   position: relative;
-  transition: .2s;
+  transition: 0.2s;
 
   .btn-delete {
     display: none;
@@ -485,7 +623,7 @@ export default {
 }
 
 .low-brightness {
-  filter: brightness(.4);
+  filter: brightness(0.4);
 }
 
 .active-btn {
@@ -497,6 +635,7 @@ export default {
   align-items: center;
 
   div {
+    width: auto;
     width: auto;
 
     img {
@@ -510,5 +649,4 @@ export default {
   height: 5vh;
   background-color: #4a5568;
 }
-
 </style>

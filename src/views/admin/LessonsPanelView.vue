@@ -10,20 +10,19 @@
 
           <div class="filter">
             <div class="filter-params">
-              <input type="text" v-model="searchText" @input="search()" placeholder="Введите название или содержимое урока" class="search input">
+              <BaseInput type="text" v-model="searchText" @input="search()" placeholder="Введите название или содержимое урока" class="search input" />
               <select v-model="selectedType" @change="search()" class="type input">
                 <option value="">Все</option>
                 <option value="1">Теория</option>
                 <option value="2">Практика</option>
               </select>
             </div>
-            <button @click.prevent="resetFilter" class="btn btn-primary">Сбросить</button>
+            <BaseButton @click.prevent="resetFilter" class="btn btn-primary">Сбросить</BaseButton>
           </div>
 
 
           <div class="lessons-panel__lessons__item  legend">
             <h4 class="lessons-panel__lessons__item__title"><strong>Задание</strong></h4>
-            <p class="lessons-panel__lessons__item__text media-hidden"><strong>Текст</strong></p>
             <p class="lessons-panel__lessons__item__type media-hidden"><strong>Тип</strong></p>
           </div>
 
@@ -31,29 +30,27 @@
             <h4 class="lessons-panel__lessons__item__title">
               {{lesson.title}}
             </h4>
-            <p class="lessons-panel__lessons__item__text" v-html="lesson.theory"></p>
 
             <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id==1">Теория</p>
             <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id==2">Практика</p>
 
-            <a @click.prevent="$event=>getLessonRouter(lesson.url_title)" class="btn-primary btn">Подробнее</a>
+            <BaseButton  @click.prevent="$event=>getLessonRouter(lesson.title)" variant="primary">Подробнее</BaseButton>
           </div>
 
           <div v-if="this.searchText=='' && this.selectedType==''" class="lessons-panel__lessons__item"  v-for="(lesson, index) in displayedLessons" :key="index">
             <h4 class="lessons-panel__lessons__item__title">
               {{lesson.title}}
             </h4>
-            <p class="lessons-panel__lessons__item__text" v-html="lesson.theory"></p>
 
             <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id==1">Теория</p>
             <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id==2">Практика</p>
 
-            <button @click.prevent="$event=>getLessonRouter(lesson.title)" class="btn-primary btn">Подробнее</button>
+            <BaseButton  @click.prevent="$event=>getLessonRouter(lesson.title)" variant="primary">Подробнее</BaseButton>
           </div>
           <div v-if="this.searchText=='' && this.selectedType==''" class="pagination">
-            <button v-if="currentPage > 1" @click="currentPage--">Предыдущая</button>
+            <BaseButton variant="primary" v-if="currentPage > 1" @click="currentPage--">Предыдущая</BaseButton>
             <span>{{currentPage}} / {{pageCount}}</span>
-            <button v-if="currentPage < pageCount" @click="currentPage++">Следующая</button>
+            <BaseButton variant="primary" v-if="currentPage < pageCount" @click="currentPage++">Следующая</BaseButton>
           </div>
 
 
@@ -68,9 +65,11 @@
 import axios from "axios";
 import ControlPanelView from '@/views/admin/ControlPanelView.vue'
 import { authRequest } from '@/api/api.js'
+import BaseInput from '@/components/form/InputComponent.vue'
+import BaseButton from '@/components/form/BaseButton.vue'
 export default {
     name: "LessonsPanelView",
-  components: { ControlPanelView },
+  components: { BaseButton, BaseInput, ControlPanelView },
     data(){
         return{
             data:[],
@@ -183,12 +182,9 @@ export default {
         min-width: 70px;
         max-width: 70px;
 
-        /* Эти опции - необходимые условия */
         overflow: hidden;
         white-space: nowrap;
 
-        /* Добавляем троеточия в конце предложения, если текст
-        не помещается в блок */
         text-overflow: ellipsis;
       }
       &__type{
@@ -199,12 +195,9 @@ export default {
         min-width: 450px;
         max-width: 450px;
 
-        /* Эти опции - необходимые условия */
         overflow: hidden;
         white-space: nowrap;
 
-        /* Добавляем троеточия в конце предложения, если текст
-        не помещается в блок */
         text-overflow: ellipsis;
       }
     }

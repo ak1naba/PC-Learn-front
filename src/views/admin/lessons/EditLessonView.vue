@@ -2,33 +2,33 @@
   <ControlPanelView>
     <div class="lesson-add">
       <h2 class="lesson-add__title">Добавить занятие</h2>
-      <form @submit.prevent="editWork" class="lesson-add__form">
+      <form v-if="lesson" @submit.prevent="editWork" class="lesson-add__form">
         <div class="lesson-add__form__block">
-          <BaseInput v-model="this.work.title" type="text" placeholder="Название" />
+          <BaseInput v-model="this.lesson.title" type="text" placeholder="Название" />
         </div>
         <div class="lesson-add__form__block">
           <QuillEditor
             theme="snow"
-            v-model:content="work.theory"
+            v-model:content="lesson.theory"
             contentType="html"
             :options="editorOptions"
           />
         </div>
         <div class="lesson-add__form__block">
-          <select v-model="this.work.type_lesson_id" name="type_lesson" class="input">
+          <select v-model="this.lesson.type_lesson_id" name="type_lesson" class="input">
             <option value="1" class="input">Теория</option>
             <option value="2" class="input">Практика</option>
           </select>
         </div>
         <div class="lesson-add__form__block line">
-          <input type="checkbox" class="input" v-model="this.work.hard_binding" id="hard_binding" />
+          <input type="checkbox" class="input" v-model="this.lesson.hard_binding" id="hard_binding" />
           <label for="hard_binding">Жесткая привязка объектов</label>
         </div>
         <div class="lesson-add__form__block">
-          <BaseButton type="submit" class="btn btn-primary"> Добавить </BaseButton>
+          <BaseButton type="submit" class="btn btn-primary"> Сохранить </BaseButton>
         </div>
-        <div class="alert" v-if="this.work.error != null">
-          {{ this.work.error }}
+        <div class="alert" v-if="this.lesson.error != null">
+          {{ this.lesson.error }}
         </div>
       </form>
     </div>
@@ -84,7 +84,7 @@ export default {
     editWork() {
       if (this.lesson.theory != '' && this.lesson.theory != null) {
         authRequest({
-          method: 'post',
+          method: 'patch',
           url: `/api/lessons/${this.lesson.id}`,
           data: this.lesson,
         })
@@ -100,10 +100,12 @@ export default {
       }
     },
     getLesson() {
-      axios
-        .get('/api/lesson/' + this.url_title)
+      authRequest({
+        method: 'get',
+        url: `/api/lesson/${this.url_title}`,
+      })
         .then((res) => {
-          this.lesson = res.data.data
+          this.lesson = res.data
           this.lesson.hard_binding = Boolean(res.data.data.hard_binding)
         })
         .catch((err) => {
@@ -117,4 +119,53 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.tox-notifications-container {
+  display: none;
+}
+
+.lesson-add {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  &__title {
+    font-size: 1.2em;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    &__block {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+  }
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+/* Стили для Quill Editor */
+:deep(.ql-toolbar) {
+  border-radius: 4px 4px 0 0;
+  border: 1px solid #ccc;
+}
+
+:deep(.ql-container) {
+  border-radius: 0 0 4px 4px;
+  border: 1px solid #ccc;
+  height: 300px;
+}
+
+:deep(.ql-editor) {
+  min-height: 200px;
+  font-size: 16px;
+}
+</style>
