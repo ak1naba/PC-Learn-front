@@ -3,7 +3,6 @@
     :class="buttonClasses"
     :type="type"
     :disabled="disabled"
-    @click="$emit('click', $event)"
   >
     <span class="btn-content">
       <slot></slot>

@@ -3,12 +3,12 @@
     <div class="container">
       <div v-if="!isLoading" class="lesson-block">
         <div class="btn-group">
-          <BaseButton variant="danger" @click=" this.isModalActive = !this.isModalActive">Удалить</BaseButton>
+          <BaseButton variant="danger" @click="showModalWindow(); counter++">Удалить</BaseButton>
           <BaseButton variant="primary" @click="getLessonEdit()"
             >Редактировать
           </BaseButton>
         </div>
-        <div v-if="isModalActive" class="modal-window">
+        <div v-show="isModalActive" class="modal-window">
           <h3>Вы действительно хотите удалить задание?</h3>
           <div class="btn-group">
             <BaseButton @click="deleteLesson" variant="danger">Удалить</BaseButton>
@@ -230,6 +230,8 @@ export default {
       isModalActive: false,
 
       isLoading: true,
+
+      counter: 0,
     }
   },
   // импорт компонентов
