@@ -23,11 +23,11 @@
           </p>
         </div>
 
-        <form class="user-avatar__form form-user__inputs" enctype="multipart/form-data">
+        <form @submit.prevent="changeAvatar" class="user-avatar__form form-user__inputs" enctype="multipart/form-data">
           <div class="form-block">
             <BaseInput id="file" type="file" class="input" name="avatar" />
           </div>
-          <BaseButton @click.prevent="changeAvatar" variant="primary">Сменить</BaseButton>
+          <BaseButton type="submit" variant="primary">Сменить</BaseButton>
         </form>
       </dialog>
 
@@ -127,15 +127,15 @@ export default {
   computed: {},
   methods: {
     changePassword() {
-      // if (!this.form.old_password || !this.form.new_password || !this.form.new_password_confirmation) {
-      //   this.form.message_fail = 'Все поля обязательны'
-      //   return
-      // }
-      //
-      // if (this.form.new_password !== this.form.new_password_confirmation) {
-      //   this.form.message_fail = 'Пароли не совпадают'
-      //   return
-      // }
+      if (!this.form.old_password || !this.form.new_password || !this.form.new_password_confirmation) {
+        this.form.message_fail = 'Все поля обязательны'
+        return
+      }
+
+      if (this.form.new_password !== this.form.new_password_confirmation) {
+        this.form.message_fail = 'Пароли не совпадают'
+        return
+      }
 
       authRequest({
         method: 'post',
@@ -153,10 +153,10 @@ export default {
             this.form.message_fail = 'Старый пароль неверный'
           }
         })
-        /*.catch(error => {
+        .catch(error => {
           console.error('Password change error:', error)
           this.form.message_fail = error.response?.data?.message || 'Ошибка при изменении пароля'
-        })*/
+        })
     },
 
     changeAvatar() {

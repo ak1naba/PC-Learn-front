@@ -22,7 +22,7 @@ const router = createRouter({
       path: '/admin',
       component: () => import('@/views/admin/ControlPanelView.vue'),
       name: 'admin',
-      children:[
+    },
         {
           path: '/admin/users',
           component: () => import('@/views/admin/UsersPanelView.vue'),
@@ -48,9 +48,6 @@ const router = createRouter({
           component: () => import('@/views/admin/lessons/editLesson.vue'),
           name: 'admin.lessons.edit'
         },
-
-      ]
-    },
   ],
 })
 

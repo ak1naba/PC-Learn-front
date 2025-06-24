@@ -10,9 +10,9 @@
               <router-link :to="{name:'admin.users'}" class="admin-panel__columns__nav__link">Пользователи</router-link>
               <router-link :to="{name:'admin.lessons'}" class="admin-panel__columns__nav__link">Задания</router-link>
             </aside>
-            <slot class="admin-panel__columns__content">
-
-            </slot>
+            <div class="admin-panel__columns__content">
+              <slot></slot>
+            </div>
           </div>
         </div>
       </div>
@@ -21,8 +21,6 @@
 </template>
 
 <script>
-
-
 
 import BaseLayout from '@/layouts/BaseLayout.vue'
 

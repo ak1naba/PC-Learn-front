@@ -2,7 +2,7 @@
   <BaseLayout>
     <div class="container">
       <div class="form-user">
-        <form class="form-user__inputs">
+        <form @submit.prevent="login" class="form-user__inputs">
           <h2 class="form-user__inputs__title">Вход</h2>
 
           <BaseInput v-model="user.email" type="email" placeholder="Введите почту пользователя" />
@@ -12,7 +12,7 @@
             placeholder="Введите пароль пользователя"
           />
 
-          <BaseButton variant="primary" @click.prevent="login">
+          <BaseButton type="submit" variant="primary">
             {{ loading ? 'Ждите...' : 'Войти' }}
           </BaseButton>
 

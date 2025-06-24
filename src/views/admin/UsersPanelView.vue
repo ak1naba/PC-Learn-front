@@ -65,8 +65,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import ControlPanelView from '@/views/admin/ControlPanelView.vue'
+import { authRequest } from '@/api/api.js'
 
 export default {
     name: 'UsersPanelView',
@@ -75,7 +75,7 @@ export default {
         return {
             users: [],
             currentPage: 1,
-            perPage: 3,
+            perPage: 15,
             searchText:'',
             selectedType:'',
         };
@@ -103,7 +103,11 @@ export default {
     },
     methods: {
         getUsers() {
-            axios.get('/api/users')
+          authRequest({
+            method: 'post',
+            url: '/api/users',
+            data: this.form
+          })
                 .then(res => {
                     this.users = res.data.data;
                 })

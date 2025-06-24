@@ -3,7 +3,7 @@ import axios from 'axios'
 // Создаём экземпляр axios с базовыми настройками
 const api = axios.create({
   baseURL: 'http://localhost:8000',
-  timeout: 10000 // Таймаут запроса
+  timeout: 10000, // Таймаут запроса
 })
 
 // Метод для запросов с авторизацией
@@ -20,23 +20,31 @@ export const authRequest = (config) => {
     ...config,
     headers: {
       ...config.headers,
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   }
 
   return api(authConfig)
-    .then(response => response.data)
-    .catch(error => {
+    .then((response) => {
+      // Успешный ответ
+      return response.data
+    })
+    .catch((error) => {
+      // Обработка ошибок
       console.error('Auth request error:', error)
-      throw error // Пробрасываем ошибку дальше
+      throw error
     })
 }
 
 // Метод для публичных запросов
 export const publicRequest = (config) => {
   return api(config)
-    .then(response => response.data)
-    .catch(error => {
+    .then((response) => {
+      // Успешный ответ
+      return response.data
+    })
+    .catch((error) => {
+      // Обработка ошибок
       console.error('Public request error:', error)
       throw error
     })
@@ -44,11 +52,11 @@ export const publicRequest = (config) => {
 
 // Интерцептор ответов
 api.interceptors.response.use(
-  response => response,
-  error => {
+  (response) => response,
+  (error) => {
     if (error.response && error.response.status === 401) {
       console.log('Unauthorized, redirect to login')
-      // Здесь можно добавить редирект на страницу логина
+      // Можно добавить редирект сюда, если нужно
     }
     return Promise.reject(error)
   }

@@ -68,7 +68,7 @@
 import axios from "axios";
 import ControlPanelView from '@/views/admin/ControlPanelView.vue'
 export default {
-    name: "lessonsPanel",
+    name: "LessonsPanelView",
   components: { ControlPanelView },
     data(){
         return{
