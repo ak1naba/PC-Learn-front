@@ -23,7 +23,11 @@
           </p>
         </div>
 
-        <form @submit.prevent="changeAvatar" class="user-avatar__form form-user__inputs" enctype="multipart/form-data">
+        <form
+          @submit.prevent="changeAvatar"
+          class="user-avatar__form form-user__inputs"
+          enctype="multipart/form-data"
+        >
           <div class="form-block">
             <BaseInput id="file" type="file" class="input" name="avatar" />
           </div>
@@ -33,9 +37,13 @@
 
       <div class="user-progress">
         <h3 class="user-progress__title">Прогресс</h3>
-        <div class="user-progress__info">
-          <div class="user-progress__info__all">Теория</div>
-          <div class="user-progress__info__all">Практика</div>
+        <div v-if="progress" class="user-progress__info">
+          <div class="user-progress__info__all">
+            Теория - {{ this.progress.countDoneTheory }}/{{ this.progress.countTheory }}
+          </div>
+          <div class="user-progress__info__all">
+            Практика - {{ this.progress.countDonePractic }}/{{ this.progress.countPractic }}
+          </div>
         </div>
       </div>
       <div class="user-action">
@@ -54,7 +62,7 @@
               placeholder="Подтвердите пароль"
             />
           </div>
-          <BaseButton @click.prevent="changePassword" variant="primary" >Сменить</BaseButton>
+          <BaseButton @click.prevent="changePassword" variant="primary">Сменить</BaseButton>
         </form>
         <div class="success">
           {{ form.message_suc }}
@@ -66,8 +74,8 @@
       <div class="user-admin" v-if="this.user.role == 1">
         <h3 class="user-admin__title">Вам доступно администрование сайта</h3>
         <router-link class="user-admin__link" :to="{ name: 'admin.lessons' }"
-          >Панель управления</router-link
-        >
+          >Панель управления
+        </router-link>
       </div>
       <div class="user-account">
         <h3 class="user-admin__title">Удаление аккаунта</h3>
@@ -118,6 +126,7 @@ export default {
         avatar_file: null,
         avatarErrors: {},
       },
+      progress: {},
     }
   },
   props: {
@@ -127,7 +136,11 @@ export default {
   computed: {},
   methods: {
     changePassword() {
-      if (!this.form.old_password || !this.form.new_password || !this.form.new_password_confirmation) {
+      if (
+        !this.form.old_password ||
+        !this.form.new_password ||
+        !this.form.new_password_confirmation
+      ) {
         this.form.message_fail = 'Все поля обязательны'
         return
       }
@@ -140,9 +153,9 @@ export default {
       authRequest({
         method: 'post',
         url: '/api/changePassword',
-        data: this.form
+        data: this.form,
       })
-        .then(response => {
+        .then((response) => {
           console.log(response)
           if (response.data === 'success') {
             this.form.message_suc = 'Пароль изменен успешно'
@@ -153,7 +166,7 @@ export default {
             this.form.message_fail = 'Старый пароль неверный'
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Password change error:', error)
           this.form.message_fail = error.response?.data?.message || 'Ошибка при изменении пароля'
         })
@@ -169,14 +182,14 @@ export default {
         url: '/api/changeAvatar',
         data: formData,
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       })
         .then(() => {
           this.getUserData()
           this.closeFormAvatar()
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Avatar change error:', error)
           this.avatar.message = error.response?.data?.message || 'Неверный тип файла'
         })
@@ -185,13 +198,13 @@ export default {
     getUserData() {
       authRequest({
         method: 'post',
-        url: '/api/userIdOut'
+        url: '/api/userIdOut',
       })
-        .then(response => {
+        .then((response) => {
           this.user = response
           localStorage.setItem('user', JSON.stringify(response))
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Get user data error:', error)
         })
     },
@@ -208,12 +221,12 @@ export default {
       authRequest({
         method: 'post',
         url: '/api/deleteUser',
-        data: this.form
+        data: this.form,
       })
         .then(() => {
           return publicRequest({
             method: 'post',
-            url: '/logout'
+            url: '/logout',
           })
         })
         .then(() => {
@@ -221,7 +234,7 @@ export default {
           localStorage.removeItem('user')
           this.$router.push({ name: 'user.login' })
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Account deletion error:', error)
         })
     },
@@ -248,10 +261,23 @@ export default {
       this.form.old_password = null
       this.form.new_password = null
       this.form.new_password_confirmation = null
-    }
+    },
+    getUserProgress() {
+      authRequest({
+        method: 'get',
+        url: '/api/progress',
+      })
+        .then((res) => {
+          this.progress = res
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
   },
   mounted() {
     this.getUserData()
+    this.getUserProgress()
   },
 }
 </script>
@@ -264,6 +290,7 @@ export default {
   font-size: 1.8em;
   font-weight: 600;
 }
+
 .user-block {
   padding-top: 25px;
   display: flex;
@@ -271,6 +298,7 @@ export default {
   gap: 25px;
 
   margin-bottom: 50px;
+
   &__avatar {
     position: relative;
 
@@ -290,6 +318,7 @@ export default {
       object-fit: cover;
       z-index: 7;
     }
+
     .edit__avatar {
       position: absolute;
 
@@ -313,6 +342,7 @@ export default {
       }
     }
   }
+
   &__info {
     display: flex;
     flex-direction: column;
@@ -321,11 +351,13 @@ export default {
     &__name {
       font-size: 1.8em;
     }
+
     &__email {
       font-size: 1.2em;
     }
   }
 }
+
 .user-avatar {
   padding: 20px;
   border-radius: 10px;
@@ -348,10 +380,12 @@ export default {
     align-items: flex-end;
 
     margin-bottom: 25px;
+
     &__title {
       font-size: 1.4em;
       font-weight: 600;
     }
+
     &__close {
       cursor: pointer;
       display: flex;
@@ -363,21 +397,26 @@ export default {
   &__form {
     display: flex;
     gap: 25px;
+
     .btn {
       height: 46px;
     }
   }
 }
+
 .user-avatar__active {
   display: block !important;
 }
+
 .user-progress {
   margin-bottom: 50px;
+
   &__title {
     margin-bottom: 25px;
     font-size: 1.4em;
     font-weight: 600;
   }
+
   &__info {
     display: flex;
     gap: 35px;
@@ -387,6 +426,7 @@ export default {
     }
   }
 }
+
 .user-action {
   margin-bottom: 25px;
 
@@ -395,38 +435,46 @@ export default {
     font-size: 1.4em;
     font-weight: 600;
   }
+
   &__form {
     display: inline-flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 15px;
     margin-bottom: 25px;
+
     .form__part {
       display: flex;
       flex-direction: column;
       gap: 5px;
+
       input {
         width: 100%;
       }
     }
   }
+
   .success {
     color: $text-allow;
   }
+
   .invalid {
     color: $text-invalid;
   }
 }
+
 .user-admin {
   margin-bottom: 50px;
   display: flex;
   flex-direction: column;
   gap: 25px;
+
   &__title {
     margin-bottom: 25px;
     font-size: 1.4em;
     font-weight: 600;
   }
+
   &__link {
     font-size: 18px;
     color: $text-link;
@@ -438,10 +486,12 @@ export default {
   flex-direction: column;
   gap: 25px;
   margin-bottom: 50px;
+
   .btn-danger {
     width: auto;
   }
 }
+
 .delete-account {
   position: absolute;
   left: 50%;
@@ -469,6 +519,7 @@ export default {
       font-weight: 600;
       font-size: 1.4em;
     }
+
     p {
       display: flex;
       align-items: center;
@@ -477,6 +528,7 @@ export default {
     }
   }
 }
+
 .active-modal {
   display: flex !important;
 }
@@ -490,6 +542,7 @@ export default {
     gap: 25px;
 
     margin-bottom: 50px;
+
     &__avatar {
       position: relative;
 
@@ -509,6 +562,7 @@ export default {
         object-fit: cover;
       }
     }
+
     &__info {
       display: flex;
       flex-direction: column;
@@ -517,12 +571,14 @@ export default {
       &__name {
         font-size: 1.4em;
       }
+
       &__email {
         font-size: 1em;
       }
     }
   }
 }
+
 @media (max-width: 960px) {
   .user-action {
     &__form {
@@ -533,6 +589,7 @@ export default {
     &__avatar {
       .edit__avatar {
         padding: 5px;
+
         &__icon {
           width: 24px;
           height: 24px;
@@ -543,8 +600,10 @@ export default {
   .user-action {
     &__form {
       width: 100%;
+
       .form__part {
         width: 100%;
+
         .input {
           width: 100%;
         }
@@ -552,20 +611,25 @@ export default {
     }
   }
 }
+
 @media (max-width: 480px) {
   .user-block {
     flex-direction: column;
+
     &__avatar {
       padding-bottom: 35%;
       padding-right: 35%;
+
       .edit__avatar {
         padding: 5px;
+
         &__icon {
           width: 24px;
           height: 24px;
         }
       }
     }
+
     &__info {
       align-items: center;
     }
@@ -577,10 +641,12 @@ export default {
       &__title {
         font-size: 1em;
       }
+
       &__close {
         font-size: 0.8em;
       }
     }
+
     &__form {
       flex-direction: column;
     }
