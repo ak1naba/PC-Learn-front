@@ -27,6 +27,10 @@
               >Войти</router-link
             >
 
+            <router-link v-if="token" @click="showMenu" class="header-nav__links__link" :to="{name: 'game'}"
+            >Обучение</router-link
+            >
+
             <router-link v-if="token" @click="showMenu" class="header-nav__links__user" to="/home"
               >Личный кабинет</router-link
             >
@@ -46,10 +50,12 @@
 </template>
 
 <script>
+import { authRequest } from '@/api/api.js'
+
 export default {
   data() {
     return {
-      token: '',
+      token: localStorage.getItem("auth_token"),
     }
   },
   methods: {
@@ -60,15 +66,16 @@ export default {
       wrapperActive.classList.toggle('wrapper-overflow__hidden')
     },
     logout() {
-      axios.post('/logout').then((res) => {
-        localStorage.removeItem('idUser', res.data.id)
-        localStorage.removeItem('avatarUser', res.data.avatar)
-        localStorage.removeItem('nameUser', res.data.name)
-        localStorage.removeItem('emailUser', res.data.email)
-        localStorage.removeItem('roleUser', res.data.role)
+      authRequest({
+        method: 'post',
+        url: '/api/logout',
+        data: this.form
+      })
+      .then((res) => {
+        localStorage.removeItem('user')
+        localStorage.removeItem('auth_token')
 
         this.$router.push({ name: 'user.login' })
-        location.reload()
       })
     },
   },

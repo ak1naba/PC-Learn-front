@@ -436,11 +436,14 @@ export default {
 
         parentElement.appendChild(droppedElement)
 
-        axios
-          .patch('/api/materials/' + this.draggedElement + '/update', {
+        authRequest({
+          method: 'patch',
+          url: `/api/materials/${this.draggedElement}/update`,
+          data:  {
             position_x: left,
             position_y: top,
-          })
+          }
+        })
           .then((response) => {
             console.log(response)
           })

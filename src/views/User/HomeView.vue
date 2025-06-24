@@ -188,7 +188,8 @@ export default {
         url: '/api/userIdOut'
       })
         .then(response => {
-          this.user = response.data
+          this.user = response
+          localStorage.setItem('user', JSON.stringify(response))
         })
         .catch(error => {
           console.error('Get user data error:', error)

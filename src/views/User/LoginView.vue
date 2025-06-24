@@ -64,7 +64,7 @@ export default {
           console.log(response.user)
           localStorage.setItem('auth_token', `${response.token_type} ${response.access_token}`)
           localStorage.setItem('user', JSON.stringify(response.user))
-          this.$router.push({ name: 'home' })
+          this.$router.push({ name: 'game' })
         })
         .catch((error) => {
           if (error.response && error.response.status === 401) {
