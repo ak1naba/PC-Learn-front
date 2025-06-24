@@ -7,14 +7,14 @@
         <div class="users">
           <div class="filter">
             <div class="filter-params">
-              <input type="text" v-model="searchText" @input="search()" placeholder="Введите имя или почту пользователя" class="search input">
+              <BaseInput class="long" type="text" v-model="searchText" @input="search()" placeholder="Введите имя или почту пользователя" />
               <select v-model="selectedType" @change="search()" class="type input">
                 <option value="">Все</option>
                 <option value="1">Администратор</option>
                 <option value="2">Ученик</option>
               </select>
             </div>
-            <button @click.prevent="resetFilter" class="btn btn-primary">Сбросить</button>
+            <BaseButton @click.prevent="resetFilter" variant="primary">Сбросить</BaseButton>
           </div>
           <div v-if="this.searchText!='' || this.selectedType!=''" class="users-item" v-for="(user, index) in filteredUsers" :key="index">
             <div class="users-item__avatar">
@@ -47,8 +47,8 @@
                 <p v-if="user.role==1">Администратор</p>
                 <p v-if="user.role==2">Ученик</p>
               </div>
-              <div class="users-item__email">
-                {{user.created_at}}{{user.updated_at}}
+              <div class="users-item__dates">
+                {{new Date(user.created_at).toLocaleDateString('ru-RU') }}
               </div>
             </div>
             <div class="pagination">
@@ -67,10 +67,12 @@
 <script>
 import ControlPanelView from '@/views/admin/ControlPanelView.vue'
 import { authRequest } from '@/api/api.js'
+import BaseInput from '@/components/form/InputComponent.vue'
+import BaseButton from '@/components/form/BaseButton.vue'
 
 export default {
     name: 'UsersPanelView',
-  components: { ControlPanelView },
+  components: { BaseButton, BaseInput, ControlPanelView },
     data() {
         return {
             users: [],
@@ -104,12 +106,12 @@ export default {
     methods: {
         getUsers() {
           authRequest({
-            method: 'post',
+            method: 'get',
             url: '/api/users',
             data: this.form
           })
                 .then(res => {
-                    this.users = res.data.data;
+                    this.users = res.data;
                 })
                 .catch(err => {
                     console.log(err);
@@ -161,6 +163,24 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    .filter{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+
+      &__params{
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+
+        .long{
+          width: 100%;
+        }
+      }
+    }
 
     &-item{
       display: flex;

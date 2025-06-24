@@ -2,7 +2,7 @@
   <ControlPanelView>
     <div class="lesson-add">
       <h2 class="lesson-add__title">Добавить занятие</h2>
-      <form @submit.prevent="addWork" class="lesson-add__form">
+      <form @submit.prevent="editWork" class="lesson-add__form">
         <div class="lesson-add__form__block">
           <BaseInput v-model="this.work.title" type="text" placeholder="Название" />
         </div>
@@ -45,7 +45,7 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 export default {
-  name: 'AddLessonView',
+  name: 'editLesson',
   components: {
     BaseButton,
     ControlPanelView,
@@ -54,14 +54,9 @@ export default {
   },
   data() {
     return {
-      work: {
-        title: null,
-        theory: null,
-        type_lesson_id: null,
-        hard_binding: false,
-
-        error: null,
-      },
+      lesson: {},
+      url_title: this.$route.params.url_title,
+      error: null,
       editorOptions: {
         modules: {
           toolbar: [
@@ -84,14 +79,14 @@ export default {
       }
     }
   },
-  computed: {},
+
   methods: {
-    addWork() {
-      if (this.work.theory != '' && this.work.theory != null) {
+    editWork() {
+      if (this.lesson.theory != '' && this.lesson.theory != null) {
         authRequest({
           method: 'post',
-          url: '/api/lessons/add',
-          data: this.work,
+          url: `/api/lessons/${this.lesson.id}`,
+          data: this.lesson,
         })
           .then((res) => {
             console.log(res)
@@ -101,60 +96,25 @@ export default {
             console.log(err)
           })
       } else {
-        this.work.error = 'Заполните поле с информацией для задания'
+        this.error = 'Заполните поле с информацией для задания'
       }
     },
+    getLesson() {
+      axios
+        .get('/api/lesson/' + this.url_title)
+        .then((res) => {
+          this.lesson = res.data.data
+          this.lesson.hard_binding = Boolean(res.data.data.hard_binding)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+  },
+  mounted() {
+    this.getLesson()
   },
 }
 </script>
 
-<style scoped lang="scss">
-.tox-notifications-container {
-  display: none;
-}
-
-.lesson-add {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-
-  &__title {
-    font-size: 1.2em;
-  }
-
-  &__form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-
-    &__block {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-  }
-}
-
-.line {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-}
-
-/* Стили для Quill Editor */
-:deep(.ql-toolbar) {
-  border-radius: 4px 4px 0 0;
-  border: 1px solid #ccc;
-}
-
-:deep(.ql-container) {
-  border-radius: 0 0 4px 4px;
-  border: 1px solid #ccc;
-  height: 300px;
-}
-
-:deep(.ql-editor) {
-  min-height: 200px;
-  font-size: 16px;
-}
-</style>
+<style scoped></style>

@@ -1,7 +1,10 @@
 import '@/assets/style/base.scss'
+import $ from 'jquery'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+
+window.$ = window.jQuery = $
 
 import App from './App.vue'
 import router from './router'

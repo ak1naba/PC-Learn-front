@@ -40,12 +40,12 @@ const router = createRouter({
         },
         {
           path: '/admin/lesson/:url_title',
-          component: () => import('@/views/admin/lessons/lesson.vue'),
+          component: () => import('@/views/admin/lessons/LessonView.vue'),
           name: 'admin.lessons.lesson'
         },
         {
           path: '/admin/lesson/edit/:url_title',
-          component: () => import('@/views/admin/lessons/editLesson.vue'),
+          component: () => import('@/views/admin/lessons/EditLessonView.vue'),
           name: 'admin.lessons.edit'
         },
   ],

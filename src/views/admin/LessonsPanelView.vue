@@ -48,7 +48,7 @@
             <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id==1">Теория</p>
             <p class="lessons-panel__lessons__item__type" v-if="lesson.type_lesson_id==2">Практика</p>
 
-            <button @click.prevent="$event=>getLessonRouter(lesson.url_title)" class="btn-primary btn">Подробнее</button>
+            <button @click.prevent="$event=>getLessonRouter(lesson.title)" class="btn-primary btn">Подробнее</button>
           </div>
           <div v-if="this.searchText=='' && this.selectedType==''" class="pagination">
             <button v-if="currentPage > 1" @click="currentPage--">Предыдущая</button>
@@ -67,6 +67,7 @@
 
 import axios from "axios";
 import ControlPanelView from '@/views/admin/ControlPanelView.vue'
+import { authRequest } from '@/api/api.js'
 export default {
     name: "LessonsPanelView",
   components: { ControlPanelView },
@@ -81,9 +82,13 @@ export default {
     },
     methods:{
         getLessons(){
-            axios.get('/api/lessons')
+          authRequest({
+            method: 'get',
+            url: '/api/lessons',
+            data: this.form
+          })
                 .then(res=>{
-                        this.data=res.data.data;
+                        this.data=res.data;
                     }
                 )
                 .catch(err=>{
