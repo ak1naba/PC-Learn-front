@@ -8,7 +8,6 @@ const api = axios.create({
 
 // Метод для запросов с авторизацией
 export const authRequest = (config) => {
-  // Получаем токен из localStorage
   const token = localStorage.getItem('auth_token')
 
   if (!token) {
@@ -26,11 +25,9 @@ export const authRequest = (config) => {
 
   return api(authConfig)
     .then((response) => {
-      // Успешный ответ
       return response.data
     })
     .catch((error) => {
-      // Обработка ошибок
       console.error('Auth request error:', error)
       throw error
     })
@@ -40,11 +37,9 @@ export const authRequest = (config) => {
 export const publicRequest = (config) => {
   return api(config)
     .then((response) => {
-      // Успешный ответ
       return response.data
     })
     .catch((error) => {
-      // Обработка ошибок
       console.error('Public request error:', error)
       throw error
     })
@@ -56,7 +51,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       console.log('Unauthorized, redirect to login')
-      // Можно добавить редирект сюда, если нужно
+      this.$router.push({ name: 'user.login' })
     }
     return Promise.reject(error)
   }
