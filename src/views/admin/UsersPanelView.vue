@@ -7,8 +7,8 @@
         <div class="users">
           <div class="filter">
             <div class="filter-params">
-              <BaseInput class="long" type="text" v-model="searchText" @input="search()" placeholder="Введите имя или почту пользователя" />
-              <select v-model="selectedType" @change="search()" class="type input">
+              <BaseInput class="search" type="text" v-model="searchText" @input="search()" placeholder="Введите имя или почту пользователя" />
+              <select v-model="selectedType" @change="search()" class="type">
                 <option value="">Все</option>
                 <option value="1">Администратор</option>
                 <option value="2">Ученик</option>
@@ -164,20 +164,22 @@ export default {
     flex-direction: column;
     gap: 10px;
 
-    .filter{
+    .filter {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
+      gap: 15px;
+      width: 100%;
 
-      &__params{
+      &-params {
+        width: 75%;
         display: flex;
-        flex-direction: row;
-        gap: 10px;
-        align-items: center;
+        gap: 15px;
 
-        .long{
-          width: 100%;
+        .search {
+          width: 75%;
+        }
+
+        .type {
+          width: 25%;
         }
       }
     }

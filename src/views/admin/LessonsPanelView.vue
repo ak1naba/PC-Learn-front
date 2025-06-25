@@ -179,8 +179,8 @@ export default {
       gap: 15px;
 
       &__title{
-        min-width: 70px;
-        max-width: 70px;
+        min-width: 270px;
+        max-width: 270px;
 
         overflow: hidden;
         white-space: nowrap;

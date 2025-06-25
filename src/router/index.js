@@ -99,7 +99,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('auth_token');
-  const roleUser = JSON.parse(localStorage.getItem('roleUser'))?.role; // Добавлена безопасная проверка
+  const roleUser = JSON.parse(localStorage.getItem('user')).role; // Добавлена безопасная проверка
 
   // Настройка доступа к общедоступным страницам
   if (to.name && to.name.startsWith('commercial.')) {
